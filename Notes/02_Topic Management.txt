@@ -1,0 +1,14 @@
+Create a Topic:
+kafka-topics.bat --bootstrap-server localhost:9092 --create --topic application_log --partitions 3 --replication-factor 1
+
+List topics:
+kafka-topics.bat --bootstrap-server localhost:9092 --list
+
+Describe a Topic:
+kafka-topics.bat --bootstrap-server localhost:9092 --describe --topic application_log
+
+Update number of partitions:
+kafka-topics.bat --bootstrap-server localhost:9092 --alter --topic application_log --partitions 3
+
+Delete a Topic:
+kafka-topics.bat --bootstrap-server localhost:9092 --delete --topic application_log

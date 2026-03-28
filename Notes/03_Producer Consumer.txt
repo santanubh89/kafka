@@ -1,0 +1,66 @@
+Produce message:
+.\kafka-console-producer.bat --bootstrap-server localhost:9092 --topic request-data
+.\kafka-console-producer.bat --bootstrap-server localhost:9092 --topic request-data --producer-property acks=all
+.\kafka-console-producer.bat --bootstrap-server localhost:9092 --topic request-data --producer-property acks=all --producer-property partitioner.class=org.apache.kafka.clients.producer.RoundRobinPartitioner
+
+Consume message:
+.\kafka-console-consumer.bat --bootstrap-server localhost:9092 --topic request-data
+.\kafka-console-consumer.bat --bootstrap-server localhost:9092 --topic request-data --from-beginning
+.\kafka-console-consumer.bat --bootstrap-server localhost:9092 --topic request-data --formatter kafka.tools.DefaultMessageFormatter --property print.key=true --property print.value=true --property key.separator=: --property print.timestamp=true --property print.partition=true --from-beginning
+--------------------------------------------------------------------------------------------------------------------------------------------------
+Produce message with key:
+.\kafka-console-producer.bat --bootstrap-server localhost:9092 --topic request-data --property parse.key=true --property key.separator=: --producer-property partitioner.class=org.apache.kafka.clients.producer.RoundRobinPartitioner --producer-property acks=all
+>key1:value1
+
+Consume message with key:
+.\kafka-console-consumer.bat --bootstrap-server localhost:9092 --topic request-data --property print.key=true --property key.separator=:
+--------------------------------------------------------------------------------------------------------------------------------------------------
+Print message details in consumer:
+.\kafka-console-consumer.bat --bootstrap-server localhost:9092 --topic request-data --formatter kafka.tools.DefaultMessageFormatter --property print.key=true --property print.value=true --property key.separator=: --property print.timestamp=true --property print.partition=true --from-beginning
+CreateTime:1771230186953:Partition:1:1:one
+CreateTime:1771230189674:Partition:2:2:two
+CreateTime:1771230191676:Partition:0:3:three
+CreateTime:1771230193857:Partition:1:4:four
+CreateTime:1771230196041:Partition:2:5:five
+CreateTime:1771230199149:Partition:0:5:FIVE
+--------------------------------------------------------------------------------------------------------------------------------------------------
+Consume message with consumer group:
+.\kafka-console-consumer.bat --bootstrap-server localhost:9092 --topic application_log --formatter kafka.tools.DefaultMessageFormatter --property print.key=true --property print.value=true --property key.separator=: --property print.timestamp=true --property print.partition=true --group log_processor_app
+CreateTime:1771230706123:Partition:2:3:three
+CreateTime:1771230712264:Partition:2:6:siz
+CreateTime:1771230721737:Partition:2:9:nine
+
+.\kafka-console-consumer.bat --bootstrap-server localhost:9092 --topic application_log --formatter kafka.tools.DefaultMessageFormatter --property print.key=true --property print.value=true --property key.separator=: --property print.timestamp=true --property print.partition=true --group log_processor_app
+CreateTime:1771230702927:Partition:1:1:one
+CreateTime:1771230704412:Partition:0:2:two
+CreateTime:1771230708306:Partition:1:4:four
+CreateTime:1771230710176:Partition:0:5:five
+CreateTime:1771230716951:Partition:1:7:seven
+CreateTime:1771230719734:Partition:0:8:eigjt
+CreateTime:1771230723626:Partition:1:10:ten
+--------------------------------------------------------------------------------------------------------------------------------------------------
+List Consumer Groups:
+.\kafka-consumer-groups.bat --bootstrap-server localhost:9092 --list
+
+Describe Consumer Group:
+.\kafka-consumer-groups.bat --bootstrap-server localhost:9092 --describe --group log_processor_app
+GROUP             TOPIC           PARTITION  CURRENT-OFFSET  LOG-END-OFFSET  LAG             CONSUMER-ID                                           HOST            CLIENT-ID
+log_processor_app application_log 1          10              10              0               console-consumer-7b722b8f-6971-4914-b006-1ebd7f97626c /192.168.29.181 console-consumer
+log_processor_app application_log 0          10              10              0               console-consumer-7b722b8f-6971-4914-b006-1ebd7f97626c /192.168.29.181 console-consumer
+log_processor_app application_log 2          11              11              0               console-consumer-a2207237-8762-4d82-98c5-8d01e24fb619 /192.168.29.181 console-consumer
+
+### After shutting down all consumers, lag will increase:
+GROUP             TOPIC           PARTITION  CURRENT-OFFSET  LOG-END-OFFSET  LAG             CONSUMER-ID     HOST            CLIENT-ID
+log_processor_app application_log 1          10              18              8               -               -               -
+log_processor_app application_log 2          11              20              9               -               -               -
+log_processor_app application_log 0          10              19              9               -               -               -
+
+Reset Consumer Group Offset:
+.\kafka-consumer-groups.bat --bootstrap-server localhost:9092 --group log_processor_app --topic application_log --reset-offsets --to-earliest --execute
+
+.\kafka-consumer-groups.bat --bootstrap-server localhost:9092 --describe --group log_processor_app
+GROUP             TOPIC           PARTITION  CURRENT-OFFSET  LOG-END-OFFSET  LAG             CONSUMER-ID     HOST            CLIENT-ID
+log_processor_app application_log 1          0               18              18              -               -               -
+log_processor_app application_log 2          0               20              20              -               -               -
+log_processor_app application_log 0          0               19              19              -               -               -
+
