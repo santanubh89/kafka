@@ -1,0 +1,45 @@
+Create a Kafka Topic:
+.\kafka-topics.bat --bootstrap-server localhost:9092 --create --topic request-topic
+.\kafka-topics.bat --bootstrap-server localhost:9092 --create --topic request-topic --partitions 3
+\kafka-topics.bat --bootstrap-server localhost:9092 --create --topic request-topic --partitions 5 --replication-factor 1
+
+-------------------------------------------------------------------------------------
+List all Kafka Topics:
+.\kafka-topics.bat --bootstrap-server localhost:9092 --list
+
+-------------------------------------------------------------------------------------
+Describe a Kafka Topic:
+.\kafka-topics.bat --bootstrap-server localhost:9092 --describe --topic order-topic
+
+Topic: order-topic      TopicId: T4qz1EfVR7OhpbPkrQkGYg PartitionCount: 5       ReplicationFactor: 1    Configs:
+        Topic: order-topic      Partition: 0    Leader: 0       Replicas: 0     Isr: 0  Elr: N/A        LastKnownElr: N/A
+        Topic: order-topic      Partition: 1    Leader: 0       Replicas: 0     Isr: 0  Elr: N/A        LastKnownElr: N/A
+        Topic: order-topic      Partition: 2    Leader: 0       Replicas: 0     Isr: 0  Elr: N/A        LastKnownElr: N/A
+        Topic: order-topic      Partition: 3    Leader: 0       Replicas: 0     Isr: 0  Elr: N/A        LastKnownElr: N/A
+        Topic: order-topic      Partition: 4    Leader: 0       Replicas: 0     Isr: 0  Elr: N/A        LastKnownElr: N/A
+-------------------------------------------------------------------------------------
+Increase Partitions in a Kafka Topic:
+
+
+-------------------------------------------------------------------------------------
+Delete a Kafka Topic:
+.\kafka-topics.bat --bootstrap-server localhost:9092 --delete --topic order-topic
+
+-------------------------------------------------------------------------------------
+Produce Message:
+.\kafka-console-producer.bat --bootstrap-server localhost:9092 --topic application-topic
+.\kafka-console-producer.bat --bootstrap-server localhost:9092 --topic application-topic --producer-property acks=all
+.\kafka-console-producer.bat --bootstrap-server localhost:9092 --topic application-topic --property parse.key=true --property key.separator=:
+.\kafka-console-producer.bat --bootstrap-server localhost:9092 --topic application-topic --producer-property partitioner.class=org.apache.kafka.clients.producer.RoundRobinPartitioner
+
+Consumer Message:
+.\kafka-console-consumer.bat --bootstrap-server localhost:9092 --topic application-topic
+.\kafka-console-consumer.bat --bootstrap-server localhost:9092 --topic application-topic --from-beginning
+.\kafka-console-consumer.bat --bootstrap-server localhost:9092 --topic application-topic --from-beginning --formatter=kafka.tools.DefaultMessageFormatter --property print.timestamp=true --property print.key=true --property print.value=true --property print.partition=true
+.\kafka-console-consumer.bat --bootstrap-server localhost:9092 --topic application-topic --formatter=kafka.tools.DefaultMessageFormatter --property print.timestamp=true --property print.key=true --property print.value=true --property print.partition=true --group my-application
+
+Describer a Consumer Group:
+.\kafka-consumer-groups.bat --bootstrap-server localhost:9092 --describe --group Wikimedia.Change.Processor
+
+Reset offset for a Consumer Group:
+.\kafka-consumer-groups.bat --bootstrap-server localhost:9092 --group my-application --reset-offsets --to-earliest --topic application-topic --execute
