@@ -1,0 +1,75 @@
+=============================================================================================Kafka Management=============================================================================================
+Start Zookeeper:
+zookeeper-server-start.sh config/zookeeper.properties
+
+Start Kafka:
+kafka-server-start.sh config/server.properties
+
+=============================================================================================Topic Management=============================================================================================
+create a topic:
+kafka-topics.sh --bootstrap-server localhost:9092 --create --topic user-creation-requests
+kafka-topics.sh --bootstrap-server localhost:9092 --create --topic user-creation-requests --partitions 5
+kafka-topics.sh --command-config conduktor.config --bootstrap-server cluster.playground.cdkt.io:9092 --create --topic user-creation-requests --partitions 5  --replication-factor 3
+====================
+list all topics:
+kafka-topics.sh --bootstrap-server localhost:9092 --list
+===================
+describe a topic:
+kafka-topics.sh --command-config conduktor.config --bootstrap-server cluster.playground.cdkt.io:9092 --describe --topic user-creation-requests
+
+Topic: user-creation-requests   PartitionCount: 5       ReplicationFactor: 3    Configs: cleanup.policy=delete,retention.ms=604800000
+        Topic: user-creation-requests   Partition: 0    Leader: 24      Replicas: 24,32,25      Isr: 24,32,25
+        Topic: user-creation-requests   Partition: 1    Leader: 37      Replicas: 37,9,17       Isr: 37,9,17
+        Topic: user-creation-requests   Partition: 2    Leader: 14      Replicas: 14,22,36      Isr: 14,22,36
+        Topic: user-creation-requests   Partition: 3    Leader: 14      Replicas: 14,22,36      Isr: 14,22,36
+        Topic: user-creation-requests   Partition: 4    Leader: 24      Replicas: 24,32,25      Isr: 24,32,25
+===================
+increase partitions in a topic:
+kafka-topics.sh --command-config conduktor.config --bootstrap-server cluster.playground.cdkt.io:9092 --alter --topic user-creation-requests --partitions 7
+
+delete a topic:
+kafka-topics.sh --bootstrap-server localhost:9092 --delete --topic user-creation-requests
+
+=================================================================================================Producer=================================================================================================
+produce with key:
+kafka-console-producer.sh --producer.config conduktor.config --bootstrap-server cluster.playground.cdkt.io:9092 --topic user-creation-requests --property parse.key=true -property=key.separator=#
+>1312#{"username":"santanu"}
+===================
+produce without key:
+kafka-console-producer.sh --producer.config conduktor.config --bootstrap-server cluster.playground.cdkt.io:9092 --topic user-creation-requests
+kafka-console-producer.sh --producer.config conduktor.config --bootstrap-server cluster.playground.cdkt.io:9092 --topic user-creation-requests --producer-property acks=all
+
+=================================================================================================Consumer=================================================================================================
+consume only new messages:
+kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic user-creation-requests
+kafka-console-consumer.sh --consumer.config conduktor.config --bootstrap-server cluster.playground.cdkt.io:9092 --topic user-creation-requests
+
+kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic user-creation-requests --producer-property partitioner.class=org.apache.kafka.clients.producer.RoundRobinPartitioner --topic user-creation-requests
+
+consume all messages:
+kafka-console-consumer.sh --consumer.config conduktor.config --bootstrap-server cluster.playground.cdkt.io:9092 --topic user-creation-requests --from-beginning
+
+show detailed info:
+kafka-console-consumer.sh --consumer.config conduktor.config --bootstrap-server cluster.playground.cdkt.io:9092 --topic user-creation-requests --formatter kafka.tools.DefaultMessageFormatter --property print.timestamp=true --property print.key=true --property print.value=true --property print.partition=true --from-beginning
+
+kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic user-creation-requests --formatter kafka.tools.DefaultMessageFormatter --property print.timestamp=true --property print.key=true --property print.value=true --property print.partition=true
+
+show both key and value:
+kafka-console-consumer.sh --consumer.config conduktor.config --bootstrap-server cluster.playground.cdkt.io:9092 --topic user-creation-requests --formatter kafka.tools.DefaultMessageFormatter --property print.key=true --property print.value=true --from-beginning
+
+==============================================================================================Consumer Group==============================================================================================
+consumer group:
+kafka-console-consumer.sh --consumer.config conduktor.config --bootstrap-server cluster.playground.cdkt.io:9092 --topic user-creation-requests --group my-app-1
+
+list consumer groups:
+kafka-consumer-groups.sh --timeout 60000 --command-config conduktor.config --bootstrap-server cluster.playground.cdkt.io:9092 --list
+
+describe a consumer group:
+kafka-consumer-groups.sh --timeout 60000 --command-config conduktor.config --bootstrap-server cluster.playground.cdkt.io:9092 --describe --group my-app-1
+
+delete a consumer group:
+kafka-consumer-groups.sh --command-config conduktor.config --bootstrap-server cluster.playground.cdkt.io:9092 --delete --group my-app-1
+
+reset offset:
+kafka-consumer-groups.sh --command-config conduktor.config --bootstrap-server cluster.playground.cdkt.io:9092 --group my-app-1 --reset-offsets --to-earliest --topic user-creation-requests --dry-run
+kafka-consumer-groups.sh --command-config conduktor.config --bootstrap-server cluster.playground.cdkt.io:9092 --group my-app-1 --reset-offsets --to-latest --topic user-creation-requests --execute

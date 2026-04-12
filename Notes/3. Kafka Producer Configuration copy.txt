@@ -1,0 +1,16 @@
+acks = all (producer level):
+Ensures data is properly replicated
+
+min.insync.replicas = 2 (broker/topic level):
+Ensures two brokers in ISR at least have the data after an ack
+
+retries = MAX_INT (producer level)
+Ensures transient errors are retried indefinitely
+
+max.in.flight.requests.per.connection = 1 (producer level):
+Ensures only one requests is tried at any time, preventing message reordering in case of retries
+
+enable.idempotence = true (producer level):
+acks = all, retries = MAX_INT, max.in.flight.requests.per.connection = 5
+Ordering guarantee and improves performance
+

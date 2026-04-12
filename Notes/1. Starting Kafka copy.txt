@@ -1,0 +1,14 @@
+==========Pre-requisites==========
+- Go to Kafka home
+- create data/kafka and data/zookeeper
+- Go to config director
+- update the below property in zookeeper.properties
+- dataDir=X:/Tools/kafka_2.13-3.3.1/data/zookeeper
+- update the below properties in server.properties
+- log.dirs=X:/Tools/kafka_2.13-3.3.1/data/kafka
+
+==========Starting Zookeeper==========
+.\zookeeper-server-start.bat ..\..\config\zookeeper.properties
+
+==========Starting Kafka==========
+.\kafka-server-start.bat ..\..\config\server.properties

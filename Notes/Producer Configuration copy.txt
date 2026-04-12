@@ -1,0 +1,104 @@
+acks = 0 | 1 | all (-1)
+Indicates how many replicas would acknowledge when a message is sent to Kafka.
+When acks = 0: acknowledgement will be sent even before leader writes the message
+When acks = 1: acknowledgement will be sent once leader writes the message but does not wait for the in sync replicas
+when acks = all (-1) acknowledgement will be sent once leaders as well as min.insync.replicas write the message
+
+Effect of this property depend on the value of min.insync.replicas configured in the broker.
+when acks = all and min.insync.replicas = 1: acknowledgement will be sent once leader writes the message
+when acks = all and min.insync.replicas = 2: acknowledgement will be sent once leader and one ISR writes the message
+when acks = all and min.insync.replicas = N: acknowledgement will be sent once leader and N-1 ISR writes the message
+===========================================================================================================================
+batch.size = 16384 (in bytes)
+Producer waits for batch to reach this size before sending the message
+if a batch is filled before linger.ms, increae the batch size
+increasing the batch size can help increasing the compression, throughput
+if a message size is higher than batch size, there will be no batching
+a batch is allocated per partition
+===========================================================================================================================
+bootstrap.servers = host:9092
+host:port of leader or any kafka broker in the cluster
+===========================================================================================================================
+client.dns.lookup = use_all_dns_ips
+===========================================================================================================================
+client.id = producer-1
+===========================================================================================================================
+compression.type = none | gz | lz4 | snappy | zstd
+advantage: send smaller data with better network throughput and less latency
+disadavantage: higher cpu utilizatipon compress (producer side) and decompress (consumer side)
+snappy and lz4 have optimal speed/compressopm ratio
+modify linger.ms and batch.size to have bigger batches and thus giving more compression/higher throughput
+===========================================================================================================================
+connections.max.idle.ms = 540000
+===========================================================================================================================
+enable.idempotence = true
+indicates idempotent producer
+if set to true, prevents duplicate message due to network error (such as producer not receiving ack)
+broker will retrun successful ack even without writing the message
+for idempotent producer, use the below configuration:
+retries = Integer.MAX_VALUE
+max.in.flight.requests = 5
+acks = all
+===========================================================================================================================
+interceptor.classes = []
+===========================================================================================================================
+key.serializer = class org.apache.kafka.common.serialization.StringSerializer
+===========================================================================================================================
+value.serializer = class org.apache.kafka.common.serialization.StringSerializer
+===========================================================================================================================
+linger.ms = 0
+how long to wait until producer send a batch.
+ading a small number (5ms) helps add more messages in the batch at the expense of latency
+===========================================================================================================================
+buffer.memory = 33554432
+if the producer produces faster than broker can accept, records will be buffered in the memory
+buffer.memory indicates the size of send buffer
+===========================================================================================================================
+max.block.ms = 60000
+if the buffer is full (32 MB), .send method will be blocked
+max.block.ms is the time .send() will block until throwing an exception
+if the buffer is still not empty, exception will be thrown
+exception would indicate that the broker cannot accept any new request
+===========================================================================================================================
+max.in.flight.requests.per.connection = 5
+how many request produced can be made in parallel
+set to 5 to ensure maximum performance while keeping message ordering
+===========================================================================================================================
+max.request.size = 1048576
+===========================================================================================================================
+metadata.max.age.ms = 300000
+===========================================================================================================================
+metadata.max.idle.ms = 300000
+===========================================================================================================================
+partitioner.adaptive.partitioning.enable = true
+===========================================================================================================================
+partitioner.availability.timeout.ms = 0
+===========================================================================================================================
+partitioner.class = null
+===========================================================================================================================
+partitioner.ignore.keys = false
+===========================================================================================================================
+receive.buffer.bytes = 32768
+===========================================================================================================================
+reconnect.backoff.max.ms = 1000
+===========================================================================================================================
+reconnect.backoff.ms = 50
+===========================================================================================================================
+request.timeout.ms = 30000
+===========================================================================================================================
+retries = 2147483647
+how many retries to be done in case of transient failure such as NOT_ENOUGH_REPLICAS
+===========================================================================================================================
+retry.backoff.ms = 100
+how much time to wait for the next retry
+===========================================================================================================================
+delivery.timeout.ms = 120000
+retry will happen till the configured value of delivery.timeout.ms
+the retry will fail after 2 minutes
+===========================================================================================================================
+send.buffer.bytes = 131072
+===========================================================================================================================
+transaction.timeout.ms = 60000
+===========================================================================================================================
+transactional.id = null
+===========================================================================================================================
